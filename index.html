@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Clicker Fishing Game - Full Version</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: flex-start; /* Align containers to the top */
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f0f8ff;
+            margin: 0;
+            color: #333;
+            padding-top: 30px; /* Add some top padding */
+        }
+
+        #game-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 550px;
+            margin-bottom: 20px;
+        }
+
+        #fishing-button {
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        #fishing-button:hover {
+            background-color: #45a049;
+        }
+
+        #fishing-button:active {
+            transform: scale(0.98);
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            min-height: 50px;
+        }
+
+        #inventory, #money-display, #current-rod, #fish-index, #level-display, #achievements-list-container {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            text-align: left;
+            background: #fafafa;
+        }
+        
+        /* LEVEL DISPLAY */
+        #level-display {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            background-color: #ffe0b2;
+            padding: 15px 10px;
+        }
+
+        #progress-container {
+            width: 100%;
+            height: 15px;
+            background-color: #ddd;
+            border-radius: 7px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        #level-progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #ff9800;
+            transition: width 0.3s ease-out;
+        }
+
+        #progress-text {
+            font-size: 0.8em;
+            margin-top: 3px;
+            color: #555;
+        }
+
+
+        #money-display {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2196F3;
+            text-align: center;
+        }
+
+        #current-rod {
+            font-size: 0.9em;
+            text-align: center;
+            background-color: #e0f7fa;
+        }
+
+        /* Rarity Classes (Used for color spans) */
+        .rarity-common { color: #555; }
+        .rarity-uncommon { color: #008000; }
+        .rarity-rare { color: #0000ff; }
+        .rarity-epic { color: #a020f0; } 
+        .rarity-legendary { color: #800080; }
+        .rarity-mythic { color: #ff8c00; }
+        .rarity-exotic { color: #ffd700; } 
+        .rarity-secret { color: #ff69b4; }
+        .rarity-depthful { color: #005f73; font-weight: bold; }
+        .rarity-ethereal { color: #9d4edd; font-weight: bold; }
+        .rarity-cosmic { color: #ff006e; font-weight: bold; }
+        .rarity-void { color: #1e1e1e; background-color: #aaa; color: #fff; } 
+        .rarity-temporal { color: #ff4500; font-weight: bold; } 
+        .rarity-chromatic { color: #ff00ff; font-weight: bold; } 
+        .rarity-primal { color: #a0522d; font-weight: bold; } 
+        .rarity-celestial { color: #4682b4; font-weight: bold; } 
+        .rarity-divine { color: #daa520; font-weight: bold; } 
+        .rarity-legendary-x { color: #ff0000; font-weight: bold; } 
+        .rarity-ultimate { color: #00ffff; font-weight: bold; } 
+        .rarity-astral { color: #7fff00; font-weight: bold; } 
+        .rarity-cosmic-horror { color: #6f2dbf; font-weight: bold; } 
+        .rarity-omega { color: #f0f8ff; background-color: #000; font-weight: bold; } 
+        .rarity-apex { color: #dc143c; }
+        .rarity-dimensional { color: #00bfff; font-weight: bold; } 
+        .rarity-reality { color: #ffc0cb; font-weight: bold; background-color: #800000; }
+        .rarity-singularity { color: #000; background-color: #fff; font-weight: bold; border: 2px solid #000; }
+        .rarity-existence { color: #fff; background-color: #000080; font-weight: bold; border: 2px solid #000; }
+        .rarity-omnipresence { color: #ff00ff; font-weight: bold; background-color: #333; }
+        .rarity-origin { color: #ff4500; font-weight: bold; border: 2px solid #ff4500; }
+        .rarity-pinnacle { color: #00ffff; font-weight: bold; background-color: #800000; }
+        .rarity-eternal { color: #ffd700; font-weight: bold; background-color: #000000; }
+        
+        /* NEW ULTRA TIER ROD STYLES */
+        .rarity-hyperbolic { color: #00ff00; font-weight: bold; background-color: #4b0082; }
+        .rarity-transcendent { color: #ff69b4; font-weight: bold; background-color: #191970; }
+        .rarity-omnific { color: #ffffff; font-weight: bold; background-color: #8b0000; }
+        
+        /* --- NEW ULTRA-RARITIES --- */
+        .rarity-absolute { color: #000000; background-color: #ffffff; border: 4px double #ff0000; font-weight: bolder; }
+        .rarity-supremacy { color: #ffffff; background-color: #0000ff; border: 4px double #ffffff; font-weight: bolder; }
+        .rarity-transcendence { color: #ff00ff; background-color: #000000; border: 4px double #ffff00; font-weight: bolder; }
+        .rarity-primordial { color: #800000; background-color: #ffa500; border: 4px double #800000; font-weight: bolder; }
+        .rarity-unbound { color: #ffffff; background-color: #ff00ff; border: 4px double #00ffff; font-weight: bolder; }
+        .rarity-null { color: #ff0000; background-color: #000000; border: 4px double #ff0000; font-weight: bolder; }
+        .rarity-true_form { color: #00ff00; background-color: #800080; border: 4px double #ffffff; font-weight: bolder; }
+        .rarity-axiomatic { color: #00ffff; background-color: #008000; border: 4px double #ff0000; font-weight: bolder; }
+        .rarity-final { color: #ffffff; background-color: #ff4500; border: 4px double #000000; font-weight: bolder; }
+        .rarity-maximum { color: #000000; background-color: #ffffff; border: 5px solid #000000; font-weight: bolder; }
+
+
+        /* --- Shop/Crafting Styles --- */
+        #shop-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none; 
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #shop-box {
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .shop-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background: #f7f7f7;
+        }
+
+        .rod-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .rod-item:last-child {
+            border-bottom: none;
+        }
+        
+        .rod-stats {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 3px;
+        }
+        
+        .rod-stats span {
+            margin-right: 15px;
+        }
+
+        .buy-button, .craft-button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: bold;
+        }
+        
+        .buy-button {
+            background-color: #007bff;
+        }
+
+        .craft-button {
+            background-color: #ff9800;
+        }
+
+        .buy-button:disabled, .craft-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .equipped-label {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+        
+        .recipe-materials {
+            font-size: 0.85em;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        /* --- Mini-Game Overlay Styles --- */
+        #minigame-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none; 
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        #minigame-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        /* Minigame Display - Restored Target Style */
+        #progress-bar-container {
+            width: 100%;
+            height: 25px;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #333;
+        }
+
+        #target-area { 
+            position: absolute;
+            left: 45%; /* Center the target area */
+            width: 10%; /* Fixed width for the target */
+            height: 100%;
+            background-color: #00cc00; /* Green target */
+            z-index: 10;
+        }
+
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #2196F3; /* Blue progress bar */
+            position: absolute;
+            left: 0;
+            z-index: 20;
+            transition: width 0.1s linear; 
+        }
+
+        #minigame-button {
+            padding: 12px 25px;
+            font-size: 18px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #minigame-feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 20px;
+        }
+
+        /* Achievements Styles */
+        .achievement-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dotted #ddd;
+            opacity: 0.5; /* Locked by default */
+        }
+        
+        .achievement-item.completed {
+            opacity: 1; 
+            background: #e6ffe6;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .achievement-title {
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .achievement-desc {
+            font-size: 0.8em;
+            color: #555;
+        }
+
+        .achievement-icon {
+            margin-right: 10px;
+            font-size: 1.5em;
+        }
+
+        .achievement-status {
+            font-size: 0.7em;
+            font-weight: bold;
+            color: #888;
+            min-width: 80px;
+            text-align: right;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <h2>🌊 Ultimate Clicker Fishing Game 🐟</h2>
+    
+    <div id="level-display">
+        Level <span id="current-level">1</span>
+        <div id="progress-container">
+            <div id="level-progress-bar"></div>
+        </div>
+        <div id="progress-text">0 / 50 Fish Caught</div>
+    </div>
+
+    <div id="money-display">💰 Money: $0</div>
+    
+    <div id="current-rod">
+        🎣 Current Rod: <span id="rod-name">Basic Rod</span> (Luck: <span id="rod-luck">0</span>, Lure Speed: <span id="rod-speed">1.0x Reel Progress</span>)
+    </div>
+
+    <div id="button-group">
+        <button id="fishing-button">Click to Fish!</button>
+        <button id="shop-button">🛒 Open Shop</button>
+        <button id="save-button" style="background-color:#007bff;">💾 Save Game</button>
+    </div>
+
+    <div id="result">Waiting for a bite...</div>
+
+    <div id="inventory">
+        <h3>Inventory</h3>
+        <ul id="fish-list">
+            </ul>
+        <button id="sell-all-button">Sell All Fish</button>
+    </div>
+
+    <div id="fish-index">
+        <h3>Fish Index (Discovered)</h3>
+        <ul id="index-list">
+            </ul>
+    </div>
+
+    <div id="achievements-list-container">
+        <h3>🏆 Achievements</h3>
+        <div id="achievements-list">
+            </div>
+    </div>
+</div>
+
+<div id="shop-overlay">
+    <div id="shop-box">
+
+        <div class="shop-section">
+            <h4>💰 Purchase Rods</h4>
+            <p>Buy entry-level rods directly with money.</p>
+            <div id="shop-items-list">
+                </div>
+        </div>
+
+        <div class="shop-section">
+            <h4>🛠️ Crafting Station</h4>
+            <p>Craft advanced rods using rare fish from your inventory.</p>
+            <div id="crafting-recipes-list">
+                </div>
+        </div>
+
+        <button class="buy-button" style="background-color: #6c757d; width: 100%;" onclick="closeShop()">Close Shop</button>
+    </div>
+</div>
+
+<div id="minigame-overlay">
+    <div id="minigame-box">
+        <h3>Mini-Game: Reel it In!</h3>
+        <p>Click the button repeatedly to reel in the fish.</p>
+        
+        <div id="progress-bar-container">
+            <div id="target-area"></div> 
+            <div id="progress-bar"></div>
+        </div>
+
+        <p id="minigame-feedback">Clicks Remaining: <span id="clicks-remaining">5</span></p>
+        <button id="minigame-button">REEL!</button>
+    </div>
+</div>
+
+<script>
+    // --- Configuration ---
+    const RARITIES = [
+        // Rarity Order is defined here, from least rare to most rare
+        { name: 'Common', chance: 70, colorClass: 'rarity-common', value: 10, icon: '🐟' },
+        { name: 'Uncommon', chance: 15, colorClass: 'rarity-uncommon', value: 30, icon: '🐠' },
+        { name: 'Rare', chance: 8, colorClass: 'rarity-rare', value: 80, icon: '🐡' },
+        { name: 'Epic', chance: 3, colorClass: 'rarity-epic', value: 250, icon: '🦐' }, 
+        { name: 'Legendary', chance: 2, colorClass: 'rarity-legendary', value: 750, icon: '🦈' },
+        { name: 'Mythic', chance: 1, colorClass: 'rarity-mythic', value: 2000, icon: '🐉' },
+        { name: 'Exotic', chance: 0.5, colorClass: 'rarity-exotic', value: 6000, icon: '🦑' }, 
+        { name: 'Secret', chance: 0.25, colorClass: 'rarity-secret', value: 15000, icon: '👻' },
+        { name: 'Depthful', chance: 0.2, colorClass: 'rarity-depthful', value: 50000, icon: '🌑' },
+        { name: 'Ethereal', chance: 0.1, colorClass: 'rarity-ethereal', value: 150000, icon: '✨' },
+        { name: 'Cosmic', chance: 0.05, colorClass: 'rarity-cosmic', value: 500000, icon: '🌠' },
+        { name: 'Void', chance: 0.025, colorClass: 'rarity-void', value: 1500000, icon: '⚫' },
+        { name: 'Temporal', chance: 0.015, colorClass: 'rarity-temporal', value: 4000000, icon: '⏳' },
+        { name: 'Chromatic', chance: 0.01, colorClass: 'rarity-chromatic', value: 10000000, icon: '🌈' },
+        { name: 'Primal', chance: 0.007, colorClass: 'rarity-primal', value: 25000000, icon: '🌋' },
+        { name: 'Celestial', chance: 0.005, colorClass: 'rarity-celestial', value: 60000000, icon: '☀️' },
+        { name: 'Divine', chance: 0.003, colorClass: 'rarity-divine', value: 150000000, icon: '🔱' },
+        { name: 'Legendary X', chance: 0.002, colorClass: 'rarity-legendary-x', value: 400000000, icon: '❗' },
+        { name: 'Ultimate', chance: 0.001, colorClass: 'rarity-ultimate', value: 1000000000, icon: '👑' },
+        { name: 'Astral', chance: 0.0005, colorClass: 'rarity-astral', value: 7000000000, icon: '🌟' }, 
+        { name: 'Cosmic Horror', chance: 0.00025, colorClass: 'rarity-cosmic-horror', value: 35000000000, icon: '👾' }, 
+        { name: 'Omega', chance: 0.0001, colorClass: 'rarity-omega', value: 200000000000, icon: '🌌' }, 
+        { name: 'Apex', chance: 0.00005, colorClass: 'rarity-apex', value: 1000000000000, icon: '🔴' }, 
+        { name: 'Dimensional', chance: 0.00002, colorClass: 'rarity-dimensional', value: 150000000000000, icon: '🌀' }, 
+        { name: 'Reality', chance: 0.000005, colorClass: 'rarity-reality', value: 400000000000000, icon: '⬜' },
+        { name: 'Singularity', chance: 0.000001, colorClass: 'rarity-singularity', value: 1000000000000000, icon: '⚫' },
+
+        { name: 'Existence', chance: 0.0000005, colorClass: 'rarity-existence', value: 5000000000000000, icon: '🟦' },
+        { name: 'Omnipresence', chance: 0.0000002, colorClass: 'rarity-omnipresence', value: 25000000000000000, icon: '🟪' },
+        { name: 'Origin', chance: 0.00000008, colorClass: 'rarity-origin', value: 100000000000000000, icon: '🟠' },
+        { name: 'Pinnacle', chance: 0.00000002, colorClass: 'rarity-pinnacle', value: 500000000000000000, icon: '💎' },
+        { name: 'Eternal', chance: 0.000000005, colorClass: 'rarity-eternal', value: 2000000000000000000, icon: '⚜️' },
+        
+        // --- NEW 10 ULTRA RARITIES (BETTER THAN ETERNAL) ---
+        { name: 'Absolute', chance: 0.000000002, colorClass: 'rarity-absolute', value: 50000000000000000000, icon: '🔆' }, // 50 Quintillion
+        { name: 'Supremacy', chance: 0.000000001, colorClass: 'rarity-supremacy', value: 150000000000000000000, icon: '💯' }, // 150 Quintillion
+        { name: 'Transcendence', chance: 0.0000000005, colorClass: 'rarity-transcendence', value: 500000000000000000000, icon: '♾️' }, // 500 Quintillion
+        { name: 'Primordial', chance: 0.0000000002, colorClass: 'rarity-primordial', value: 1500000000000000000000, icon: '🌋' }, // 1.5 Sextillion
+        { name: 'Unbound', chance: 0.0000000001, colorClass: 'rarity-unbound', value: 5000000000000000000000, icon: '✨' }, // 5 Sextillion
+        { name: 'Null', chance: 0.00000000005, colorClass: 'rarity-null', value: 15000000000000000000000, icon: '⚫' }, // 15 Sextillion
+        { name: 'True Form', chance: 0.00000000002, colorClass: 'rarity-true_form', value: 50000000000000000000000, icon: '🟢' }, // 50 Sextillion
+        { name: 'Axiomatic', chance: 0.00000000001, colorClass: 'rarity-axiomatic', value: 150000000000000000000000, icon: '📐' }, // 150 Sextillion
+        { name: 'Final', chance: 0.000000000005, colorClass: 'rarity-final', value: 500000000000000000000000, icon: '🟥' }, // 500 Sextillion
+        { name: 'Maximum', chance: 0.000000000001, colorClass: 'rarity-maximum', value: 2000000000000000000000000, icon: '✅' }, // 2 Septillion
+        // --- END NEW RARITIES ---
+        
+    ].sort((a, b) => b.chance - a.chance);
+
+    const FISH_NAMES = {
+        'Common': ['Minnow', 'Trout', 'Bass', 'Sardine', 'Anchovy', 'Cod', 'Flounder', 'Prawn'],
+        'Uncommon': ['Perch', 'Carp', 'Catfish', 'Haddock', 'Snapper', 'Mackerel', 'Bluegill', 'Goby'],
+        'Rare': ['Salmon', 'Eel', 'Pike', 'Halibut', 'Tuna', 'Dolphin Fish', 'Redfish', 'Sea Bass'],
+        'Epic': ['Mahi-Mahi', 'Kingfish', 'Barracuda', 'Grouper', 'Wahoo', 'Albacore', 'Amberjack'], 
+        'Legendary': ['Blue Marlin', 'Swordfish', 'Giant Squid', 'Opah', 'Viperfish', 'Arapaima'],
+        'Mythic': ['Kraken Trout', 'Sunken Shark', 'Nessie Bass', 'Siren Salmon', 'Phantom Eel', 'Giga Ray'],
+        'Exotic': ['Abyssal Dragonfish', 'Void Ray', 'Crystal Cod', 'Lava Bass', 'Electric Flounder', 'Shadow Salmon'],
+        'Secret': ['Cosmic Jellyfish', 'Ethereal Blob', 'Time Trout', 'Ghost Mackerel', 'Dream Tilapia'],
+        'Depthful': [
+            'Shadow Fin', 'Glow Whale', 'Deep Sea Angler', 'Chasm Shark', 'Crag Cod', 'Onyx Bass', 
+            'Trench Eel', 'Midnight Flounder', 'Pressure Carp'
+        ],
+        'Ethereal': [
+            'Whisper Eel', 'Astral Shrimp', 'Phantom Flounder', 'Mist Marlin', 'Aurora Trout', 'Spirit Carp',
+            'Specter Salmon', 'Vapor Whale'
+        ],
+        'Cosmic': [
+            'Stardust Ray', 'Nebula Tetra', 'Galactic Grouper', 'Comet Carp', 'Black Hole Bass', 'Quasar Fish',
+            'Void Starfish', 'Wormhole Wrasse'
+        ],
+        'Void': [
+            'Empty Fin', 'Null Clam', 'Zero Cod', 'Entropy Eel',
+            'Non-Existent Tuna', 'Oblivion Prawn'
+        ],
+        'Temporal': [
+            'Clockwork Trout', 'Epoch Bass', 'Momentary Pike', 'Chrono Flounder',
+            'Relic Salmon', 'Past Perch'
+        ],
+        'Chromatic': [
+            'Rainbow Minnow', 'Prism Shark', 'Spectrum Bass', 'Iridescent Wrasse',
+            'Holo Ray', 'Lightwave Ling'
+        ],
+        'Primal': [
+            'Dinosaur Sturgeon', 'Tar Pit Perch', 'Ancient Carp', 'Fossil Fin',
+            'Stone Scale', 'Magmafin'
+        ],
+        'Celestial': [
+            'Sunfish', 'Moon Trout', 'Planet Prawn', 'Starfish',
+            'Zodiac Carp', 'Orion Grouper'
+        ],
+        'Divine': [
+            'Godly Bass', 'Angel Fin', 'Holy Mackerel', 'Seraphim Salmon',
+            'Halo Haddock', 'Olympus Eel'
+        ],
+        'Legendary X': [
+            'The One That Got Away', 'Infinite Eel', 'Ultimate Squid',
+            'The Uncatchable', 'Fate Fin'
+        ],
+        'Ultimate': [
+            'The Creator Cod', 'Omni-Bass', 'Final Fin', 
+            'Alpha Sturgeon', 'Grand Kraken'
+        ],
+        'Astral': [ 
+            'Idea Fish', 'Concept Carp', 'Dream Leviathan', 
+            'Thought Trout', 'Pure Entity', 'Starlight Trout', 'Cosmic Flounder'
+        ],
+        'Cosmic Horror': [ 
+            'The World Eater', 'The Fin of Fate', 'The Destroyer', 
+            'World Serpent', 'Titan Shark', 'Existential Cod'
+        ],
+        'Omega': [ 
+            'Primordial Leviathan', 'Oceanius Rex', 'Absolute Zero Fin', 
+            'God Hand Ray', 'Void Essence Bass' 
+        ],
+        'Apex': [ 
+            'Omega Trout', 'Apex Predator Shark', 'Final Boss Cod', 
+            'Infinity Fish', 'Dimensional Carp' 
+        ],
+        'Dimensional': [ 
+            'Hyperspace Tuna', 'Quantum Shark', 'Paradox Pike',
+            'Multiverse Ray', 'Mirror Fish'
+        ],
+        'Reality': [ 
+            'The Editor', 'The Source Cod', 'Pattern Shark',
+            'Law of Physics Fish', 'True Form Eel'
+        ],
+        'Singularity': [ 
+            'The Unseen', 'Final Entity', 'Perfect Fish',
+            'Absolute Zero', 'Origin'
+        ],
+        'Existence': [ 
+            'Omnipotent Trout', 'Axiom Prawn', 'Logic Eel',
+            'The Definition', 'First Cause Carp'
+        ],
+        'Omnipresence': [ 
+            'Everywhere Fin', 'Timeless Tuna', 'Ubiquitous Shark',
+            'The Observer', 'Fourth Dimension Ray'
+        ],
+        'Origin': [ 
+            'Big Bang Bass', 'Seed Salmon', 'Protogenesis Pike',
+            'First Light Flounder', 'The Beginning'
+        ],
+        'Pinnacle': [ 
+            'Zenith Eel', 'The Apex Point', 'Acme Angler',
+            'Summit Sturgeon', 'Ultimate Zenith'
+        ],
+        'Eternal': [ 
+            'Infinite Carp', 'Forever Fin', 'Aion Bass',
+            'Eternity Eel', 'The Unending'
+        ],
+        // --- NEW FISH NAMES ---
+        'Absolute': ['Absolute Unit', 'The Whole Thing', 'Limitless Trout'],
+        'Supremacy': ['Alpha Predator', 'The Ultimate Fin', 'Apex Entity'],
+        'Transcendence': ['God Fin', 'Ethereal King', 'The Final Catch'],
+        'Primordial': ['Ancient Source', 'First Wave Fish', 'Unborn Bass'],
+        'Unbound': ['Free Fin', 'Unrestricted Ray', 'Pure Energy Cod'],
+        'Null': ['Zero Point Tuna', 'Anti-Existence Fish', 'Entropy Fin'],
+        'True Form': ['Perfect Bass', 'Core Salmon', 'True Entity'],
+        'Axiomatic': ['Self-Evident Eel', 'Irrefutable Ray', 'Theorem Trout'],
+        'Final': ['Final Boss Ray', 'End of Time Fish', 'Apocalypse Cod'],
+        'Maximum': ['The Absolute Limit', 'Maxxed Fin', 'Finality Pike'],
+        // --- END NEW FISH NAMES ---
+
+    };
+    
+    // Rods 
+    const FISHING_RODS = [
+        // --- Purchase Rods (Base 18 + 3 Old Ultra Tier + 3 New Ultra Tier + 3 NEWEST Purchase Rods = 27 total) ---
+        { id: 'basic', name: 'Basic Rod', cost: 0, luck: 0, lureSpeedMultiplier: 1.0 },
+        { id: 'wood', name: 'Wooden Rod', cost: 100, luck: 5, lureSpeedMultiplier: 1.2 },
+        { id: 'fiberglass', name: 'Fiberglass Rod', cost: 500, luck: 15, lureSpeedMultiplier: 1.5 },
+        { id: 'graphite', name: 'Graphite Rod', cost: 2500, luck: 40, lureSpeedMultiplier: 2.0 },
+        { id: 'steel', name: 'Steel Rod', cost: 10000, luck: 80, lureSpeedMultiplier: 2.5 },
+        
+        { id: 'hardened_steel', name: 'Hardened Steel Rod', cost: 30000, luck: 150, lureSpeedMultiplier: 3.0 },
+
+        { id: 'titanium', name: 'Titanium Rod', cost: 100000, luck: 300, lureSpeedMultiplier: 3.5 },
+        
+        { id: 'grade_5_titanium', name: 'Grade 5 Titanium Rod', cost: 350000, luck: 700, lureSpeedMultiplier: 4.0 },
+
+        { id: 'carbon', name: 'Carbon Fiber Rod', cost: 1000000, luck: 1500, lureSpeedMultiplier: 5.0 },
+        
+        { id: 'layered_carbon', name: 'Layered Carbon Rod', cost: 5000000, luck: 3500, lureSpeedMultiplier: 6.0 },
+
+        { id: 'maglev', name: 'Maglev Line Rod', cost: 20000000, luck: 8000, lureSpeedMultiplier: 7.5 },
+        
+        { id: 'quantum_line', name: 'Quantum Line Rod', cost: 75000000, luck: 20000, lureSpeedMultiplier: 9.0 },
+        
+        { id: 'diamond', name: 'Diamond Tipped Rod', cost: 250000000, luck: 50000, lureSpeedMultiplier: 11.0 },
+
+        { id: 'reinforced_diamond', name: 'Reinforced Diamond Rod', cost: 1500000000, luck: 120000, lureSpeedMultiplier: 13.0 },
+
+        { id: 'plasma', name: 'Plasma Energy Rod', cost: 8000000000, luck: 250000, lureSpeedMultiplier: 15.0 },
+
+        { id: 'fusion_core', name: 'Fusion Core Rod', cost: 40000000000, luck: 500000, lureSpeedMultiplier: 18.0 },
+
+        { id: 'singularity_rod', name: 'Singularity Rod', cost: 150000000000, luck: 1200000, lureSpeedMultiplier: 25.0 },
+        
+        { id: 'creator', name: 'Creator’s Quill Rod', cost: 500000000000, luck: 1500000, lureSpeedMultiplier: 30.0 },
+
+        { id: 'god_hand', name: 'God Hand Rod', cost: 5000000000000, luck: 5000000, lureSpeedMultiplier: 50.0 },
+
+        // --- PREVIOUSLY NEW RODS ---
+        { id: 'transcendent_lure', name: 'Transcendent Lure Rod', cost: 15000000000000, luck: 8000000, lureSpeedMultiplier: 65.0 },
+        { id: 'omni_hook', name: 'Omni Hook Rod', cost: 40000000000000, luck: 12000000, lureSpeedMultiplier: 80.0 },
+        { id: 'limitless_line', name: 'Limitless Line Rod', cost: 100000000000000, luck: 20000000, lureSpeedMultiplier: 100.0 },
+        // --- END PREVIOUSLY NEW RODS ---
+        
+        // --- NEW PURCHASE RODS ADDED HERE (Better than Limitless Line Rod) ---
+        { id: 'cosmic_net', name: 'Cosmic Net Rod', cost: 500000000000000, luck: 50000000, lureSpeedMultiplier: 200.0 },
+        { id: 'infinite_pull', name: 'Infinite Pull Rod', cost: 2500000000000000, luck: 150000000, lureSpeedMultiplier: 500.0 },
+        { id: 'true_creation', name: 'True Creation Rod', cost: 10000000000000000, luck: 400000000, lureSpeedMultiplier: 1000.0 },
+        // --- END NEWEST PURCHASE RODS ---
+
+        // --- OLD ULTRA TIER RODS (Now slightly cheaper, and pushed down the list) ---
+        { id: 'hyperbolic_net', name: 'Hyperbolic Net Rod', cost: 30000000000000000, luck: 600000000, lureSpeedMultiplier: 2000.0 },
+        { id: 'dimensional_hook', name: 'Dimensional Hook Rod', cost: 120000000000000000, luck: 1200000000, lureSpeedMultiplier: 4000.0 },
+        { id: 'reality_warper', name: 'Reality Warper Rod', cost: 500000000000000000, luck: 2500000000, lureSpeedMultiplier: 8000.0 },
+        
+        
+        // --- Craftable Rods (GREATLY DECREASED recipe costs) ---
+
+        { id: 'ethereal_net', name: 'Ethereal Net Rod', luck: 500, lureSpeedMultiplier: 5.0, 
+            recipe: [
+                { rarity: 'Legendary', name: 'Blue Marlin', required: 1 }, // Was 3
+                { rarity: 'Mythic', name: 'Kraken Trout', required: 1 } // Was 1
+            ]
+        },
+        
+        { id: 'celestial', name: 'Celestial Rod', luck: 1000, lureSpeedMultiplier: 10.0, 
+            recipe: [
+                { rarity: 'Mythic', name: 'Kraken Trout', required: 2 }, // Was 4
+                { rarity: 'Exotic', name: 'Crystal Cod', required: 1 } // Was 2
+            ]
+        },
+
+        { id: 'cosmic_alignment', name: 'Cosmic Alignment Rod', luck: 2500, lureSpeedMultiplier: 15.0, 
+            recipe: [
+                { rarity: 'Exotic', name: 'Abyssal Dragonfish', required: 2 }, // Was 5
+                { rarity: 'Secret', name: 'Cosmic Jellyfish', required: 1 } // Was 2
+            ]
+        },
+
+        { id: 'void_siphon', name: 'Void Siphon Rod', luck: 6000, lureSpeedMultiplier: 20.0, 
+            recipe: [
+                { rarity: 'Secret', name: 'Ethereal Blob', required: 3 }, // Was 6
+                { rarity: 'Depthful', name: 'Glow Whale', required: 1 } // Was 3
+            ]
+        },
+
+        { id: 'abyss_weaver', name: 'Abyss Weaver Rod', luck: 15000, lureSpeedMultiplier: 30.0, 
+            recipe: [
+                { rarity: 'Depthful', name: 'Shadow Fin', required: 4 }, // Was 8
+                { rarity: 'Ethereal', name: 'Whisper Eel', required: 2 } // Was 4
+            ]
+        },
+
+        { id: 'temporal_thread', name: 'Temporal Thread Rod', luck: 35000, lureSpeedMultiplier: 45.0, 
+            recipe: [
+                { rarity: 'Ethereal', name: 'Astral Shrimp', required: 5 }, // Was 10
+                { rarity: 'Cosmic', name: 'Black Hole Bass', required: 2 } // Was 5
+            ]
+        },
+
+        { id: 'primal_anchor', name: 'Primal Anchor Rod', luck: 75000, lureSpeedMultiplier: 60.0, 
+            recipe: [
+                { rarity: 'Cosmic', name: 'Nebula Tetra', required: 6 }, // Was 15
+                { rarity: 'Void', name: 'Entropy Eel', required: 3 } // Was 6
+            ]
+        },
+
+        { id: 'chromatic_flux', name: 'Chromatic Flux Rod', luck: 150000, lureSpeedMultiplier: 90.0, 
+            recipe: [
+                { rarity: 'Void', name: 'Null Clam', required: 8 }, // Was 20
+                { rarity: 'Temporal', name: 'Clockwork Trout', required: 4 } // Was 8
+            ]
+        },
+
+        { id: 'divine_core', name: 'Divine Core Rod', luck: 300000, lureSpeedMultiplier: 120.0, 
+            recipe: [
+                { rarity: 'Temporal', name: 'Epoch Bass', required: 10 }, // Was 25
+                { rarity: 'Chromatic', name: 'Prism Shark', required: 5 } // Was 10
+            ]
+        },
+
+        { id: 'primal_scepter', name: 'Primal Scepter Rod', luck: 600000, lureSpeedMultiplier: 180.0, 
+            recipe: [
+                { rarity: 'Chromatic', name: 'Rainbow Minnow', required: 12 }, // Was 30
+                { rarity: 'Primal', name: 'Dinosaur Sturgeon', required: 6 } // Was 12
+            ]
+        },
+
+        { id: 'legendary_x_conduit', name: 'Legendary X Conduit Rod', luck: 1200000, lureSpeedMultiplier: 250.0, 
+            recipe: [
+                { rarity: 'Primal', name: 'Magmafin', required: 15 }, // Was 40
+                { rarity: 'Celestial', name: 'Sunfish', required: 7 } // Was 15
+            ]
+        },
+        
+        { id: 'ultimate_harness', name: 'Ultimate Harness Rod', luck: 2500000, lureSpeedMultiplier: 400.0, 
+            recipe: [
+                { rarity: 'Celestial', name: 'Starfish', required: 20 }, // Was 50
+                { rarity: 'Divine', name: 'Godly Bass', required: 10 } // Was 20
+            ]
+        },
+        
+        { id: 'astral_weave', name: 'Astral Weave Rod', luck: 5000000, lureSpeedMultiplier: 600.0, 
+            recipe: [
+                { rarity: 'Divine', name: 'Angel Fin', required: 25 }, // Was 60
+                { rarity: 'Legendary X', name: 'The Uncatchable', required: 12 } // Was 25
+            ]
+        },
+
+        { id: 'cosmic_horror_rod', name: 'Cosmic Horror Rod', luck: 10000000, lureSpeedMultiplier: 1000.0, 
+            recipe: [
+                { rarity: 'Legendary X', name: 'Infinite Eel', required: 30 }, // Was 70
+                { rarity: 'Ultimate', name: 'Omni-Bass', required: 15 } // Was 30
+            ]
+        },
+
+        { id: 'apex_destroyer', name: 'Apex Destroyer Rod', luck: 20000000, lureSpeedMultiplier: 1500.0, 
+            recipe: [
+                { rarity: 'Ultimate', name: 'Final Fin', required: 35 }, // Was 80
+                { rarity: 'Astral', name: 'Dream Leviathan', required: 17 } // Was 35
+            ]
+        },
+
+        { id: 'dimensional_caster', name: 'Dimensional Caster Rod', luck: 40000000, lureSpeedMultiplier: 2500.0, 
+            recipe: [
+                { rarity: 'Astral', name: 'Pure Entity', required: 40 }, // Was 90
+                { rarity: 'Cosmic Horror', name: 'The World Eater', required: 20 } // Was 40
+            ]
+        },
+
+        { id: 'reality_bender', name: 'Reality Bender Rod', luck: 80000000, lureSpeedMultiplier: 5000.0, 
+            recipe: [
+                { rarity: 'Cosmic Horror', name: 'Titan Shark', required: 45 }, // Was 100
+                { rarity: 'Omega', name: 'Void Essence Bass', required: 22 } // Was 45
+            ]
+        },
+        
+        { id: 'singularity_hitter', name: 'Singularity Hitter Rod', luck: 150000000, lureSpeedMultiplier: 8000.0, 
+            recipe: [
+                { rarity: 'Omega', name: 'God Hand Ray', required: 50 }, // Was 110
+                { rarity: 'Apex', name: 'Final Boss Cod', required: 25 } // Was 50
+            ]
+        },
+        
+        { id: 'final_destiny', name: 'Final Destiny Rod', luck: 500000000, lureSpeedMultiplier: 100000.0, 
+            recipe: [
+                { rarity: 'Apex', name: 'Infinity Fish', required: 60 }, // Was 120
+                { rarity: 'Dimensional', name: 'Quantum Shark', required: 30 } // Was 60
+            ]
+        },
+        
+        { id: 'trinity_caster', name: 'Trinity Caster Rod', luck: 5000000000, lureSpeedMultiplier: 250000.0, 
+            recipe: [
+                { rarity: 'Dimensional', name: 'Paradox Pike', required: 70 }, // Was 150
+                { rarity: 'Reality', name: 'The Editor', required: 35 } // Was 70
+            ]
+        },
+
+        // --- NEW CRAFTABLE RODS FOR NEW RARITIES ---
+        
+        { id: 'omnipresent_focus', name: 'Omnipresent Focus Rod', luck: 10000000000, lureSpeedMultiplier: 500000.0, 
+            recipe: [
+                { rarity: 'Reality', name: 'The Editor', required: 80 }, 
+                { rarity: 'Singularity', name: 'The Unseen', required: 40 }
+            ]
+        },
+
+        { id: 'origin_flux', name: 'Origin Flux Rod', luck: 25000000000, lureSpeedMultiplier: 1000000.0, 
+            recipe: [
+                { rarity: 'Singularity', name: 'Perfect Fish', required: 90 }, 
+                { rarity: 'Existence', name: 'Omnipotent Trout', required: 45 }
+            ]
+        },
+
+        { id: 'pinnacle_caster', name: 'Pinnacle Caster Rod', luck: 60000000000, lureSpeedMultiplier: 2500000.0, 
+            recipe: [
+                { rarity: 'Existence', name: 'Axiom Prawn', required: 100 }, 
+                { rarity: 'Omnipresence', name: 'Timeless Tuna', required: 50 }
+            ]
+        },
+
+        { id: 'eternal_thread', name: 'Eternal Thread Rod', luck: 150000000000, lureSpeedMultiplier: 5000000.0, 
+            recipe: [
+                { rarity: 'Omnipresence', name: 'Everywhere Fin', required: 120 }, 
+                { rarity: 'Origin', name: 'Big Bang Bass', required: 60 }
+            ]
+        },
+        
+        { id: 'absolute_scepter', name: 'Absolute Scepter Rod', luck: 400000000000, lureSpeedMultiplier: 10000000.0, 
+            recipe: [
+                { rarity: 'Origin', name: 'Protogenesis Pike', required: 140 }, 
+                { rarity: 'Pinnacle', name: 'Zenith Eel', required: 70 }
+            ]
+        },
+
+        { id: 'supremacy_pole', name: 'Supremacy Pole Rod', luck: 1000000000000, lureSpeedMultiplier: 20000000.0, 
+            recipe: [
+                { rarity: 'Pinnacle', name: 'Ultimate Zenith', required: 160 }, 
+                { rarity: 'Eternal', name: 'Eternity Eel', required: 80 }
+            ]
+        },
+
+        { id: 'maximum_reality_rod', name: 'Maximum Reality Rod', luck: 5000000000000, lureSpeedMultiplier: 50000000.0, 
+            recipe: [
+                { rarity: 'Eternal', name: 'Infinite Carp', required: 200 }, 
+                { rarity: 'Absolute', name: 'Absolute Unit', required: 100 }
+            ]
+        },
+        
+        { id: 'final_form_net', name: 'Final Form Net Rod', luck: 20000000000000, lureSpeedMultiplier: 100000000.0, 
+            recipe: [
+                { rarity: 'Absolute', name: 'The Whole Thing', required: 250 }, 
+                { rarity: 'Supremacy', name: 'Apex Entity', required: 125 }
+            ]
+        },
+
+        { id: 'null_zone_anchor', name: 'Null Zone Anchor Rod', luck: 100000000000000, lureSpeedMultiplier: 250000000.0, 
+            recipe: [
+                { rarity: 'Supremacy', name: 'Alpha Predator', required: 300 }, 
+                { rarity: 'Transcendence', name: 'God Fin', required: 150 }
+            ]
+        },
+
+        { id: 'unbound_source', name: 'Unbound Source Rod', luck: 500000000000000, lureSpeedMultiplier: 500000000.0, 
+            recipe: [
+                { rarity: 'Transcendence', name: 'The Final Catch', required: 400 }, 
+                { rarity: 'Primordial', name: 'Ancient Source', required: 200 }
+            ]
+        },
+
+        { id: 'axiomatic_piston', name: 'Axiomatic Piston Rod', luck: 2500000000000000, lureSpeedMultiplier: 1000000000.0, 
+            recipe: [
+                { rarity: 'Primordial', name: 'Unborn Bass', required: 500 }, 
+                { rarity: 'Unbound', name: 'Pure Energy Cod', required: 250 }
+            ]
+        },
+
+        { id: 'maximum_limit', name: 'Maximum Limit Rod', luck: 10000000000000000, lureSpeedMultiplier: 2500000000.0, 
+            recipe: [
+                { rarity: 'Unbound', name: 'Free Fin', required: 750 }, 
+                { rarity: 'Null', name: 'Zero Point Tuna', required: 375 }
+            ]
+        },
+
+        // --- FINAL CRAFTABLE ROD ---
+        { id: 'ultimate_existence_rod', name: 'Ultimate Existence Rod', luck: 50000000000000000, lureSpeedMultiplier: 5000000000.0, 
+            recipe: [
+                { rarity: 'Null', name: 'Anti-Existence Fish', required: 1000 }, 
+                { rarity: 'True Form', name: 'Perfect Bass', required: 500 }
+            ]
+        },
+
+
+    ];
+
+    // --- Game State Variables ---
+    let gameState = {
+        money: 0,
+        inventory: {}, // { 'Fish Name': count }
+        fishIndex: {}, // { 'Fish Name': true }
+        currentRodId: 'basic',
+        fishCaughtTotal: 0,
+        level: 1,
+        expToNextLevel: 50,
+        achievements: {} // { 'ach_id': true }
+    };
+    
+    // ... [Rest of the JavaScript functions (getRodStats, saveGame, loadGame, updateDisplay, formatMoney, getRarity, catchFish, checkLevelUp, openShop, buyRod, craftRod, sellAllFish, updateFishList, updateIndexList, updateAchievementList, checkAchievements, minigameStart, minigameClick)] ...
+    
+    // --- ACHIEVEMENTS ---
+    const ACHIEVEMENTS = {
+        'beginner': { title: 'First Cast', desc: 'Catch your first fish.', requiredCount: 1, type: 'fishCaughtTotal', icon: '🎣' },
+        'cash_starter': { title: 'Money Maker', desc: 'Earn $1,000.', requiredCount: 1000, type: 'moneyTotal', icon: '💸' },
+        'rare_finder': { title: 'Rare Discoverer', desc: 'Catch a Rare or better fish.', requiredCount: 3, type: 'minRarityIndex', icon: '✨' }, // Rarity index for Rare is 3
+        'legend_hunter': { title: 'Legend Hunter', desc: 'Catch a Legendary or better fish.', requiredCount: 5, type: 'minRarityIndex', icon: '👑' }, // Rarity index for Legendary is 5
+        'exotic_master': { title: 'Exotic Master', desc: 'Catch an Exotic or better fish.', requiredCount: 7, type: 'minRarityIndex', icon: '🦑' }, // Rarity index for Exotic is 7
+        'cosmic_conqueror': { title: 'Cosmic Conqueror', desc: 'Catch a Cosmic or better fish.', requiredCount: 11, type: 'minRarityIndex', icon: '🌠' }, // Rarity index for Cosmic is 11
+        'celestial_seeker': { title: 'Celestial Seeker', desc: 'Catch a Celestial or better fish.', requiredCount: 16, type: 'minRarityIndex', icon: '☀️' }, // Rarity index for Celestial is 16
+        'ultimate_angler': { title: 'Ultimate Angler', desc: 'Catch an Ultimate or better fish.', requiredCount: 19, type: 'minRarityIndex', icon: '👑' }, // Rarity index for Ultimate is 19
+        'apex_hunter': { title: 'Apex Hunter', desc: 'Catch an Apex or better fish.', requiredCount: 23, type: 'minRarityIndex', icon: '🔴' }, // Rarity index for Apex is 23
+        'singularity_survivor': { title: 'Singularity Survivor', desc: 'Catch a Singularity or better fish.', requiredCount: 26, type: 'minRarityIndex', icon: '⚫' }, // Rarity index for Singularity is 26
+        'eternal_patience': { title: 'Eternal Patience', desc: 'Catch an Eternal or better fish.', requiredCount: 30, type: 'minRarityIndex', icon: '⚜️' }, // Rarity index for Eternal is 30
+        'ultimate_fisher': { title: 'Ultimate Fisher', desc: 'Catch 1,000 fish total.', requiredCount: 1000, type: 'fishCaughtTotal', icon: '💯' },
+        'rod_collector': { title: 'Rod Collector', desc: 'Own 10 different rods.', requiredCount: 10, type: 'rodCount', icon: '⚙️' },
+        // New Rarity Achievement (Absolute or better)
+        'absolute_zero': { title: 'Absolute Zero', desc: 'Catch an Absolute or better fish.', requiredCount: 31, type: 'minRarityIndex', icon: '🔆' }, // Rarity index for Absolute is 31
+    };
+
+
+    // --- Helper Functions from previous implementation (included for completeness) ---
+
+    // Function to calculate a rod's stats safely (checks if rod exists in the array)
+    function getRodStats(rodId) {
+        const rod = FISHING_RODS.find(r => r.id === rodId);
+        return rod || FISHING_RODS[0]; // Default to Basic Rod if not found
+    }
+
+    // Function to save the game state to localStorage
+    function saveGame() {
+        // We only save the ID of the discovered rods, not the entire list
+        const ownedRods = FISHING_RODS.filter(rod => rod.owned).map(rod => rod.id);
+        
+        const saveState = {
+            ...gameState,
+            money: gameState.money.toString(), // Save large numbers as strings
+            ownedRods: ownedRods,
+            fishIndex: JSON.stringify(gameState.fishIndex),
+            inventory: JSON.stringify(gameState.inventory)
+        };
+        localStorage.setItem('fishingClickerSave', JSON.stringify(saveState));
+        document.getElementById('result').innerHTML = 'Game Saved!';
+    }
+
+    // Function to load the game state from localStorage
+    function loadGame() {
+        const savedData = localStorage.getItem('fishingClickerSave');
+        if (savedData) {
+            const loadedState = JSON.parse(savedData);
+
+            // Parse large numbers back from strings
+            loadedState.money = BigInt(loadedState.money || 0);
+            
+            // Reinitialize complex objects
+            loadedState.inventory = JSON.parse(loadedState.inventory || '{}');
+            loadedState.fishIndex = JSON.parse(loadedState.fishIndex || '{}');
+
+            gameState = { ...gameState, ...loadedState };
+
+            // Reapply owned status to rods
+            FISHING_RODS.forEach(rod => {
+                rod.owned = loadedState.ownedRods ? loadedState.ownedRods.includes(rod.id) : (rod.id === 'basic');
+            });
+            
+            // Ensure the Basic Rod is always owned upon load if not explicitly saved
+            if (!FISHING_RODS.find(r => r.id === 'basic').owned) {
+                FISHING_RODS.find(r => r.id === 'basic').owned = true;
+            }
+
+            // Ensure the current rod is actually owned
+            if (!FISHING_RODS.find(r => r.id === gameState.currentRodId)?.owned) {
+                gameState.currentRodId = 'basic';
+            }
+            
+            document.getElementById('result').innerHTML = 'Game Loaded!';
+            
+            // Check achievements and level progression on load
+            checkAchievements();
+            checkLevelUp(0); // Recalculate level progress
+
+        } else {
+            // Initialize basic rod ownership on first load
+            FISHING_RODS.find(r => r.id === 'basic').owned = true;
+            gameState.money = BigInt(0); // Initialize money as BigInt
+            document.getElementById('result').innerHTML = 'New Game Started!';
+        }
+        updateDisplay();
+    }
+
+    // Function to format large numbers
+    function formatMoney(amount) {
+        if (typeof amount === 'string') amount = BigInt(amount);
+        if (typeof amount === 'number') amount = BigInt(amount);
+
+        const SI_SYMBOLS = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc", "Ud", "Dd", "Td", "Qad", "Qid", "Sxd", "Spd", "Ocd", "Nod", "Vig"];
+        
+        let power = 0;
+        let displayAmount = amount;
+
+        // Use BigInt for comparisons
+        const thousand = BigInt(1000);
+
+        while (displayAmount >= thousand && power < SI_SYMBOLS.length - 1) {
+            displayAmount /= thousand;
+            power++;
+        }
+        
+        // Handle BigInt division (which truncates) and re-add a decimal if necessary
+        let formatted = displayAmount.toString();
+        
+        // Add one decimal place for amounts over 1000
+        if (power > 0) {
+            let remainder = amount;
+            for (let i = 0; i < power; i++) {
+                remainder /= thousand;
+            }
+            
+            let decimalPart = (amount % (thousand * BigInt(100) * BigInt(10) ** BigInt(3 * (power - 1)))).toString();
+            let decimalDigit = decimalPart.length > 0 ? decimalPart[0] : '0';
+            
+            formatted = `${remainder.toString()}.${decimalDigit}`;
+            
+            // Clean up the formatting for 1.0K, etc., which is bad
+            if (formatted.endsWith('.0')) formatted = formatted.substring(0, formatted.length - 2);
+
+        }
+        
+        return `$${formatted}${SI_SYMBOLS[power]}`;
+    }
+
+    // Function to update the main display elements
+    function updateDisplay() {
+        const currentRod = getRodStats(gameState.currentRodId);
+        
+        document.getElementById('money-display').textContent = `💰 Money: ${formatMoney(gameState.money)}`;
+        
+        // Update Rod Display
+        document.getElementById('rod-name').innerHTML = `<span class="${currentRod.colorClass || ''}">${currentRod.name}</span>`;
+        document.getElementById('rod-luck').textContent = currentRod.luck;
+        document.getElementById('rod-speed').textContent = `${currentRod.lureSpeedMultiplier}x Reel Progress`;
+
+        // Update Level Display
+        document.getElementById('current-level').textContent = gameState.level;
+        document.getElementById('progress-text').textContent = `${gameState.fishCaughtTotal} / ${gameState.expToNextLevel} Fish Caught`;
+        
+        const progressPercentage = (gameState.fishCaughtTotal / gameState.expToNextLevel) * 100;
+        document.getElementById('level-progress-bar').style.width = `${Math.min(100, progressPercentage)}%`;
+
+
+        updateFishList();
+        updateIndexList();
+        updateAchievementList();
+        updateShopDisplay(); // Update shop whenever main display updates
+    }
+    
+    // Function to get the rarity object based on luck roll
+    function getRarity(luck) {
+        let totalChance = RARITIES.reduce((sum, r) => sum + r.chance, 0);
+        
+        // Total possible chance value, adjusted by current rod's luck
+        // We calculate a base weight for luck equal to the Legendary chance (2.0)
+        const luckMultiplier = 1 + (luck / 1000); 
+
+        // Apply luck multiplier *only* to the rarer tiers
+        let modifiedRarities = RARITIES.map(rarity => {
+            if (rarity.chance < 5) { // Apply luck to anything less common than 5% base chance (Rare and up)
+                return { ...rarity, chance: rarity.chance * luckMultiplier };
+            }
+            return rarity;
+        });
+
+        // The overall sum might increase, but the selection pool is relative.
+        // Recalculate total chance with modified weights
+        totalChance = modifiedRarities.reduce((sum, r) => sum + r.chance, 0);
+
+        let roll = Math.random() * totalChance;
+        let cumulativeChance = 0;
+
+        for (const rarity of modifiedRarities) {
+            cumulativeChance += rarity.chance;
+            if (roll < cumulativeChance) {
+                return rarity;
+            }
+        }
+        
+        // Fallback to the rarest item in the list if the roll is out of bounds due to floating point error
+        return RARITIES[RARITIES.length - 1]; 
+    }
+    
+    // Minigame Variables
+    let minigameRodStats = null;
+    let fishRarity = null;
+    let clicksNeeded = 10;
+    let currentProgress = 0;
+    let currentTargetPosition = 0;
+    let currentTargetWidth = 0;
+
+    // Function to start the fishing/minigame process
+    function catchFish() {
+        document.getElementById('fishing-button').disabled = true;
+        document.getElementById('result').textContent = 'Something is biting...';
+        
+        // Determine the fish rarity first
+        minigameRodStats = getRodStats(gameState.currentRodId);
+        fishRarity = getRarity(minigameRodStats.luck);
+        
+        // Determine the minigame difficulty and duration
+        const difficultyFactor = (RARITIES.indexOf(fishRarity) + 1) / (RARITIES.length / 2); // Scales from ~0 to 2
+        
+        // Base clicks needed (e.g., Common = 5 clicks, Eternal = 20 clicks)
+        clicksNeeded = Math.max(5, Math.floor(10 + difficultyFactor * 10)); 
+        currentProgress = 0;
+        
+        // Set the Target Area: rarer fish mean smaller and more unstable target zones.
+        currentTargetWidth = Math.max(10, 40 - difficultyFactor * 15); // Width from 40% down to 10%
+
+        // Minigame display setup
+        document.getElementById('clicks-remaining').textContent = clicksNeeded;
+        document.getElementById('minigame-feedback').textContent = '';
+        document.getElementById('progress-bar').style.width = '0%';
+        
+        // Set target area size and position
+        const targetArea = document.getElementById('target-area');
+        targetArea.style.width = `${currentTargetWidth}%`;
+        
+        // Random starting position for the target
+        currentTargetPosition = Math.random() * (100 - currentTargetWidth);
+        targetArea.style.left = `${currentTargetPosition}%`;
+
+        // Start the movement timer
+        minigameStart(fishRarity.name);
+    }
+    
+    // Reel In Mini-Game Logic
+    let minigameInterval;
+    
+    function minigameStart(fishName) {
+        document.getElementById('minigame-box').getElementsByTagName('h3')[0].textContent = `Reel In the ${fishName}!`;
+        document.getElementById('minigame-overlay').style.display = 'flex';
+        document.getElementById('minigame-button').onclick = minigameClick;
+
+        // Start bar movement (optional, makes it harder)
+        let direction = 1;
+        let speed = 0.5; // Base movement speed
+        
+        minigameInterval = setInterval(() => {
+            currentTargetPosition += direction * speed;
+            
+            // Bounce off the edges
+            if (currentTargetPosition > (100 - currentTargetWidth)) {
+                currentTargetPosition = 100 - currentTargetWidth;
+                direction *= -1;
+            } else if (currentTargetPosition < 0) {
+                currentTargetPosition = 0;
+                direction *= -1;
+            }
+            
+            document.getElementById('target-area').style.left = `${currentTargetPosition}%`;
+            
+        }, 20); // Move every 20ms
+    }
+
+    function minigameClick() {
+        if (clicksNeeded <= 0) return;
+
+        clicksNeeded--;
+        document.getElementById('clicks-remaining').textContent = clicksNeeded;
+
+        const progressBar = document.getElementById('progress-bar');
+        const barContainer = document.getElementById('progress-bar-container');
+        const currentBarWidth = parseFloat(progressBar.style.width);
+        const progressIncrement = (100 / clicksNeeded) * minigameRodStats.lureSpeedMultiplier;
+        
+        // Get current progress bar position
+        const newProgress = Math.min(100, currentBarWidth + progressIncrement);
+        progressBar.style.width = `${newProgress}%`;
+        
+        // Check if the current position of the progress bar falls within the target area
+        const barEndPosition = newProgress;
+        const targetStart = currentTargetPosition;
+        const targetEnd = currentTargetPosition + currentTargetWidth;
+
+        let success = false;
+        
+        // Check if the **end** of the progress bar is within the target area
+        if (barEndPosition >= targetStart && barEndPosition <= targetEnd) {
+            currentProgress += 1;
+            document.getElementById('minigame-feedback').textContent = 'HIT! Reeling Faster!';
+            success = true;
+        } else {
+            document.getElementById('minigame-feedback').textContent = 'MISS! Slowing Down!';
+            // Reduce progress slightly on a miss
+            progressBar.style.width = `${Math.max(0, newProgress - (progressIncrement * 0.5))}%`;
+        }
+
+        if (clicksNeeded === 0) {
+            clearInterval(minigameInterval);
+            document.getElementById('minigame-overlay').style.display = 'none';
+            document.getElementById('fishing-button').disabled = false;
+            
+            // Check win condition: must have landed enough successful hits
+            // Success threshold is 50% of the initial clicks needed
+            const successThreshold = Math.ceil((10 - (minigameRodStats.lureSpeedMultiplier * 0.5)) * 0.5); // Simplified threshold
+            
+            if (success) { // Final click was a hit
+                processCatch(fishRarity);
+            } else {
+                document.getElementById('result').textContent = `The fish got away! (You needed to hit the target on the final click.)`;
+            }
+            
+            updateDisplay();
+        }
+    }
+
+
+    // Function called after minigame success
+    function processCatch(rarity) {
+        const fishName = FISH_NAMES[rarity.name][Math.floor(Math.random() * FISH_NAMES[rarity.name].length)];
+        
+        // Update Inventory
+        if (gameState.inventory[fishName]) {
+            gameState.inventory[fishName] += 1;
+        } else {
+            gameState.inventory[fishName] = 1;
+        }
+
+        // Update Index (Discovery)
+        if (!gameState.fishIndex[fishName]) {
+            gameState.fishIndex[fishName] = true;
+        }
+
+        // Update Stats
+        gameState.fishCaughtTotal++;
+        
+        // Display result
+        document.getElementById('result').innerHTML = `You caught a <span class="${rarity.colorClass}">${fishName} (${rarity.name})</span>! Value: ${formatMoney(BigInt(rarity.value))}.`;
+        
+        checkLevelUp(1); // Add 1 fish caught for level progression
+        checkAchievements();
+
+    }
+
+    // Leveling Logic
+    function checkLevelUp(fishCount) {
+        gameState.fishCaughtTotal += fishCount;
+        
+        while (gameState.fishCaughtTotal >= gameState.expToNextLevel) {
+            gameState.fishCaughtTotal -= gameState.expToNextLevel;
+            gameState.level++;
+            // Exponential increase for next level
+            gameState.expToNextLevel = Math.ceil(gameState.expToNextLevel * 1.5); 
+            document.getElementById('result').textContent += ` You reached Level ${gameState.level}!`;
+        }
+    }
+
+    // Inventory functions
+    function updateFishList() {
+        const list = document.getElementById('fish-list');
+        list.innerHTML = '';
+        
+        const sortedFish = Object.keys(gameState.inventory).sort((a, b) => {
+            const rarityA = getRarityByName(a);
+            const rarityB = getRarityByName(b);
+            // Sort by rarity (rarest first)
+            return RARITIES.indexOf(rarityB) - RARITIES.indexOf(rarityA);
+        });
+
+        sortedFish.forEach(fishName => {
+            if (gameState.inventory[fishName] > 0) {
+                const rarity = getRarityByName(fishName);
+                const li = document.createElement('li');
+                li.innerHTML = `<span class="${rarity.colorClass}">${rarity.icon} ${fishName} (${rarity.name})</span>: ${gameState.inventory[fishName]} (Value: ${formatMoney(BigInt(rarity.value * gameState.inventory[fishName]))})`;
+                list.appendChild(li);
+            }
+        });
+
+        if (list.innerHTML === '') {
+            list.innerHTML = '<li>Inventory is empty.</li>';
+        }
+    }
+
+    function updateIndexList() {
+        const list = document.getElementById('index-list');
+        list.innerHTML = '';
+
+        const discoveredFish = Object.keys(gameState.fishIndex);
+        
+        const sortedFish = discoveredFish.sort((a, b) => {
+            const rarityA = getRarityByName(a);
+            const rarityB = getRarityByName(b);
+            // Sort by rarity (rarest first)
+            return RARITIES.indexOf(rarityB) - RARITIES.indexOf(rarityA);
+        });
+        
+        sortedFish.forEach(fishName => {
+            const rarity = getRarityByName(fishName);
+            const li = document.createElement('li');
+            li.innerHTML = `<span class="${rarity.colorClass}">${rarity.icon} ${fishName} (${rarity.name})</span>`;
+            list.appendChild(li);
+        });
+
+        if (list.innerHTML === '') {
+            list.innerHTML = '<li>Catch some fish to start your Index!</li>';
+        }
+    }
+    
+    // Utility to get rarity by fish name (needed for sorting/display)
+    function getRarityByName(fishName) {
+        for (const rarity of RARITIES) {
+            if (FISH_NAMES[rarity.name]?.includes(fishName)) {
+                return rarity;
+            }
+        }
+        return RARITIES[0]; // Default to Common
+    }
+
+
+    function sellAllFish() {
+        let totalEarnings = BigInt(0);
+        let soldCount = 0;
+
+        for (const fishName in gameState.inventory) {
+            const count = gameState.inventory[fishName];
+            if (count > 0) {
+                const rarity = getRarityByName(fishName);
+                totalEarnings += BigInt(rarity.value) * BigInt(count);
+                soldCount += count;
+                gameState.inventory[fishName] = 0; // Clear inventory
+            }
+        }
+
+        if (soldCount > 0) {
+            gameState.money += totalEarnings;
+            document.getElementById('result').textContent = `Sold ${soldCount} fish for ${formatMoney(totalEarnings)}!`;
+            // Temporary money total variable for achievement checking if needed
+            // For now, we assume achievement check runs on the current total money.
+            checkAchievements(); 
+        } else {
+            document.getElementById('result').textContent = 'Nothing to sell!';
+        }
+        updateDisplay();
+    }
+
+
+    // Shop functions
+    function openShop() {
+        document.getElementById('shop-overlay').style.display = 'flex';
+        updateShopDisplay();
+    }
+
+    function closeShop() {
+        document.getElementById('shop-overlay').style.display = 'none';
+    }
+
+    function updateShopDisplay() {
+        const shopList = document.getElementById('shop-items-list');
+        const craftList = document.getElementById('crafting-recipes-list');
+        
+        shopList.innerHTML = '';
+        craftList.innerHTML = '';
+
+        // --- Purchase Rods ---
+        FISHING_RODS.filter(rod => rod.cost !== undefined).forEach(rod => {
+            const rodDiv = document.createElement('div');
+            rodDiv.className = 'rod-item';
+            
+            const isEquipped = gameState.currentRodId === rod.id;
+            const isOwned = rod.owned;
+
+            // Rod Info
+            const rodInfo = document.createElement('div');
+            rodInfo.innerHTML = `
+                <div>
+                    <span class="${rod.colorClass || ''}">${rod.name}</span>
+                    ${isEquipped ? '<span class="equipped-label">Equipped</span>' : ''}
+                </div>
+                <div class="rod-stats">
+                    <span>Luck: ${rod.luck}</span>
+                    <span>Speed: ${rod.lureSpeedMultiplier.toFixed(1)}x</span>
+                </div>
+            `;
+            rodDiv.appendChild(rodInfo);
+
+            // Buy/Equip Button
+            const actionContainer = document.createElement('div');
+            if (isOwned) {
+                const equipButton = document.createElement('button');
+                equipButton.textContent = 'Equip';
+                equipButton.className = 'buy-button';
+                equipButton.disabled = isEquipped;
+                equipButton.onclick = () => { 
+                    gameState.currentRodId = rod.id; 
+                    updateDisplay(); 
+                    updateShopDisplay(); 
+                };
+                actionContainer.appendChild(equipButton);
+            } else {
+                const buyButton = document.createElement('button');
+                buyButton.textContent = `Buy ${formatMoney(BigInt(rod.cost))}`;
+                buyButton.className = 'buy-button';
+                buyButton.disabled = gameState.money < BigInt(rod.cost);
+                buyButton.onclick = () => buyRod(rod.id);
+                actionContainer.appendChild(buyButton);
+            }
+            rodDiv.appendChild(actionContainer);
+            shopList.appendChild(rodDiv);
+        });
+
+        // --- Craftable Rods ---
+        FISHING_RODS.filter(rod => rod.recipe).forEach(rod => {
+            const rodDiv = document.createElement('div');
+            rodDiv.className = 'rod-item';
+            
+            const isEquipped = gameState.currentRodId === rod.id;
+            const isOwned = rod.owned;
+            let canCraft = true;
+
+            // Recipe Check
+            let recipeHTML = '<div class="recipe-materials">Requires: ';
+            rod.recipe.forEach(req => {
+                const fishRarity = RARITIES.find(r => r.name === req.rarity);
+                const currentCount = Object.keys(gameState.inventory)
+                    .filter(fishName => getRarityByName(fishName).name === req.rarity && fishName.includes(req.name)) // Checks for a fish of the right rarity AND right specific name
+                    .reduce((sum, fishName) => sum + gameState.inventory[fishName], 0);
+                
+                const hasRequired = currentCount >= req.required;
+                if (!hasRequired) canCraft = false;
+                
+                const colorClass = fishRarity ? fishRarity.colorClass : '';
+                recipeHTML += `<span class="${colorClass}">${fishRarity.icon} ${req.name} (${currentCount}/${req.required})</span>, `;
+            });
+            recipeHTML = recipeHTML.slice(0, -2) + '</div>'; // Remove trailing comma and space
+
+            // Rod Info
+            const rodInfo = document.createElement('div');
+            rodInfo.innerHTML = `
+                <div>
+                    <span class="${rod.colorClass || ''}">${rod.name}</span>
+                    ${isEquipped ? '<span class="equipped-label">Equipped</span>' : ''}
+                </div>
+                <div class="rod-stats">
+                    <span>Luck: ${rod.luck}</span>
+                    <span>Speed: ${rod.lureSpeedMultiplier.toFixed(1)}x</span>
+                </div>
+                ${recipeHTML}
+            `;
+            rodDiv.appendChild(rodInfo);
+            
+            // Craft/Equip Button
+            const actionContainer = document.createElement('div');
+            if (isOwned) {
+                const equipButton = document.createElement('button');
+                equipButton.textContent = 'Equip';
+                equipButton.className = 'buy-button';
+                equipButton.disabled = isEquipped;
+                equipButton.onclick = () => { 
+                    gameState.currentRodId = rod.id; 
+                    updateDisplay(); 
+                    updateShopDisplay(); 
+                };
+                actionContainer.appendChild(equipButton);
+            } else {
+                const craftButton = document.createElement('button');
+                craftButton.textContent = 'Craft';
+                craftButton.className = 'craft-button';
+                craftButton.disabled = !canCraft;
+                craftButton.onclick = () => craftRod(rod.id, rod.recipe);
+                actionContainer.appendChild(craftButton);
+            }
+            rodDiv.appendChild(actionContainer);
+            craftList.appendChild(rodDiv);
+        });
+    }
+
+    function buyRod(rodId) {
+        const rod = FISHING_RODS.find(r => r.id === rodId);
+        if (rod && gameState.money >= BigInt(rod.cost) && !rod.owned) {
+            gameState.money -= BigInt(rod.cost);
+            rod.owned = true;
+            gameState.currentRodId = rod.id;
+            document.getElementById('result').textContent = `Purchased and equipped the ${rod.name}!`;
+            checkAchievements();
+        } else {
+            document.getElementById('result').textContent = 'Cannot purchase this rod.';
+        }
+        updateDisplay();
+        updateShopDisplay();
+    }
+
+    function craftRod(rodId, recipe) {
+        const rod = FISHING_RODS.find(r => r.id === rodId);
+        if (rod && !rod.owned) {
+            let canCraft = true;
+            let materialsToConsume = {};
+
+            // 1. Check if materials are available
+            for (const req of recipe) {
+                const fishName = req.name;
+                const requiredCount = req.required;
+                let foundCount = 0;
+
+                // Find the *exact* required fish in the inventory
+                const inventoryKeys = Object.keys(gameState.inventory);
+                if (inventoryKeys.includes(fishName)) {
+                    foundCount = gameState.inventory[fishName];
+                }
+
+                if (foundCount < requiredCount) {
+                    canCraft = false;
+                    break;
+                }
+                materialsToConsume[fishName] = requiredCount;
+            }
+
+            if (canCraft) {
+                // 2. Consume materials
+                for (const fishName in materialsToConsume) {
+                    gameState.inventory[fishName] -= materialsToConsume[fishName];
+                }
+                
+                // 3. Give rod
+                rod.owned = true;
+                gameState.currentRodId = rod.id;
+                document.getElementById('result').textContent = `Crafted and equipped the ${rod.name}!`;
+                checkAchievements();
+            } else {
+                document.getElementById('result').textContent = 'Missing required materials to craft this rod.';
+            }
+        }
+        updateDisplay();
+        updateShopDisplay();
+    }
+
+    // Achievement Logic
+    function checkAchievements() {
+        for (const id in ACHIEVEMENTS) {
+            if (gameState.achievements[id]) continue; // Skip if already completed
+
+            const ach = ACHIEVEMENTS[id];
+            let completed = false;
+
+            if (ach.type === 'fishCaughtTotal' && gameState.fishCaughtTotal >= ach.requiredCount) {
+                completed = true;
+            } else if (ach.type === 'moneyTotal' && gameState.money >= BigInt(ach.requiredCount)) {
+                completed = true;
+            } else if (ach.type === 'rodCount') {
+                const ownedCount = FISHING_RODS.filter(r => r.owned).length;
+                if (ownedCount >= ach.requiredCount) {
+                    completed = true;
+                }
+            } else if (ach.type === 'minRarityIndex') {
+                // Check if the player has discovered any fish at or above the required rarity index (0 being Common)
+                const requiredRarity = RARITIES[ach.requiredCount - 1];
+                if (requiredRarity) {
+                    // Find the rarity index of the rarest fish discovered
+                    let rarestIndex = 0;
+                    for (const fishName in gameState.fishIndex) {
+                        const rarity = getRarityByName(fishName);
+                        const index = RARITIES.indexOf(rarity);
+                        if (index > rarestIndex) {
+                            rarestIndex = index;
+                        }
+                    }
+                    if (rarestIndex >= (ach.requiredCount - 1)) {
+                         completed = true;
+                    }
+                }
+            }
+
+            if (completed) {
+                gameState.achievements[id] = true;
+                document.getElementById('result').textContent += ` ACHIEVEMENT UNLOCKED: ${ach.title}!`;
+            }
+        }
+    }
+
+    function updateAchievementList() {
+        const list = document.getElementById('achievements-list');
+        list.innerHTML = '';
+        
+        for (const id in ACHIEVEMENTS) {
+            const ach = ACHIEVEMENTS[id];
+            const isCompleted = gameState.achievements[id];
+            
+            const achDiv = document.createElement('div');
+            achDiv.className = `achievement-item ${isCompleted ? 'completed' : ''}`;
+            
+            let statusText = isCompleted ? 'Completed' : 'Locked';
+            let icon = isCompleted ? '✅' : ach.icon;
+            
+            achDiv.innerHTML = `
+                <div style="display: flex; align-items: center;">
+                    <span class="achievement-icon">${icon}</span>
+                    <div>
+                        <div class="achievement-title">${ach.title}</div>
+                        <div class="achievement-desc">${ach.desc}</div>
+                    </div>
+                </div>
+                <div class="achievement-status">${statusText}</div>
+            `;
+            list.appendChild(achDiv);
+        }
+    }
+
+
+    // --- Event Listeners and Initialization ---
+    document.getElementById('fishing-button').addEventListener('click', catchFish);
+    document.getElementById('shop-button').addEventListener('click', openShop);
+    document.getElementById('sell-all-button').addEventListener('click', sellAllFish);
+    document.getElementById('save-button').addEventListener('click', saveGame);
+
+    // Initial setup
+    loadGame();
+</script>
+</body>
+</html>
